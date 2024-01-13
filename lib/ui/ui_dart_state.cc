@@ -239,6 +239,66 @@ void UIDartState::LogMessage(const std::string& tag,
   }
 }
 
+Dart_Handle UIDartState::AddPlatformPortCallback(int64_t port,
+                                                 std::string channel) {
+  if (platform_configuration_) {
+    return tonic::ToDart(
+        "AddPlatformPortCallback should not be called in ui isolate.");
+  } else {
+    std::shared_ptr<PlatformMessageHandler> handler =
+        platform_message_handler_.lock();
+    if (handler) {
+      handler->AddPlatformPortCallback(std::move(port), std::move(channel));
+    } else {
+      return tonic::ToDart(
+          "No platform channel handler registered for background isolate.");
+    }
+  }
+  return Dart_Null();
+}
+
+Dart_Handle UIDartState::RemovePlatformPortCallback(std::string channel) {
+  if (platform_configuration_) {
+    return tonic::ToDart(
+        "RemovePlatformPortCallback should not be called in ui isolate.");
+  } else {
+    std::shared_ptr<PlatformMessageHandler> handler =
+        platform_message_handler_.lock();
+    if (handler) {
+      handler->RemovePlatformPortCallback(std::move(channel));
+    } else {
+      return tonic::ToDart(
+          "No platform channel handler registered for background isolate.");
+    }
+  }
+  return Dart_Null();
+}
+
+void UIDartState::RespondToPlatformCallback(int response_id,
+                                            std::vector<uint8_t> data) {
+  std::shared_ptr<PlatformMessageHandler> handler =
+      platform_message_handler_.lock();
+  if (handler) {
+    handler->SendToPlatformPortCallbackResponse(
+        response_id, std::make_unique<fml::DataMapping>(std::move(data)));
+  } else {
+    FML_LOG(ERROR) << "UIDartState::RespondToPlatformCallback : No platform "
+                      "channel handler registered for background isolate.";
+  }
+}
+
+void UIDartState::RespondToPlatformCallbackEmpty(int response_id) {
+  std::shared_ptr<PlatformMessageHandler> handler =
+      platform_message_handler_.lock();
+  if (handler) {
+    handler->SendToPlatformPortCallbackResponseEmpty(response_id);
+  } else {
+    FML_LOG(ERROR)
+        << "UIDartState::RespondToPlatformCallbackEmpty : No platform channel "
+           "handler registered for background isolate.";
+  }
+}
+
 Dart_Handle UIDartState::HandlePlatformMessage(
     std::unique_ptr<PlatformMessage> message) {
   if (platform_configuration_) {

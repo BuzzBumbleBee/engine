@@ -647,6 +647,25 @@ class PlatformDispatcher {
   @Native<Handle Function(Handle, Handle, Handle, Handle)>(symbol: 'PlatformConfigurationNativeApi::SendPortPlatformMessage')
   external static String? __sendPortPlatformMessage(String name, int identifier, int port, ByteData? data);
 
+  /// Register Isolate send port to listen for platfrom messages
+  void addPlatformPortCallback(String name, SendPort port) {
+    final String? error = __addPlatformPortCallback(name, port.nativePort);
+    if (error != null) {
+      throw Exception(error);
+    }
+  }
+  @Native<Handle Function(Handle, Handle)>(symbol: 'PlatformConfigurationNativeApi::AddPlatformPortCallback')
+  external static String? __addPlatformPortCallback(String name, int port);
+
+  void removePlatformPortCallback(String name) {
+    final String? error = __removePlatformPortCallbackk(name);
+    if (error != null) {
+      throw Exception(error);
+    }
+  }
+  @Native<Handle Function(Handle)>(symbol: 'PlatformConfigurationNativeApi::RemovePlatformPortCallback')
+  external static String? __removePlatformPortCallbackk(String name);
+
   /// Registers the current isolate with the isolate identified with by the
   /// [token]. This is required if platform channels are to be used on a
   /// background isolate.
@@ -709,6 +728,10 @@ class PlatformDispatcher {
     return (ByteData? data) {
       registrationZone.runUnaryGuarded(callback, data);
     };
+  }
+
+  void dispachPlatformMessageFromIsolate(String name, ByteData? data, int responseId) {
+    _dispatchPlatformMessage(name, data, responseId);
   }
 
   /// Send a message to the framework using the [ChannelBuffers].
