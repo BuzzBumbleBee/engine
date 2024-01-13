@@ -140,6 +140,8 @@ source_set("ui") {
     "window/platform_configuration.h",
     "window/platform_message.cc",
     "window/platform_message.h",
+    "window/platform_message_listener_dart_port.cc",
+    "window/platform_message_listener_dart_port.h",
     "window/platform_message_response.cc",
     "window/platform_message_response.h",
     "window/platform_message_response_dart.cc",
