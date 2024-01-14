@@ -180,9 +180,10 @@ void PlatformMessageHandlerAndroid::RemovePlatformPortCallback(
   std::lock_guard lock(pending_callback_responses_mutex_);
   auto it = active_callbacks_.find(channel);
   if (it == active_callbacks_.end()) {
-    FML_LOG(ERROR) << "PlatformMessageHandlerAndroid::RemovePlatformPortCallback "
-                      ":No isolate callbacks set for "
-                   << channel << " channel.";
+    FML_LOG(ERROR)
+        << "PlatformMessageHandlerAndroid::RemovePlatformPortCallback "
+           ":No isolate callbacks set for "
+        << channel << " channel.";
     return;
   }
   FML_LOG(ERROR) << "PlatformMessageHandlerAndroid::RemovePlatformPortCallback "
